@@ -12,7 +12,7 @@ class GameViewModel: ObservableObject {
      Loop for game
      
      1. Begin game with dealer and user
-        a. Create deck of 52 Cards
+        a. Create deck of 52 Cards [x]
      2. Dealer gets 2 cards, user gets 2
         a. dealer onlys shows 1 to user
      3. user choose to add to bet or no change
@@ -26,9 +26,9 @@ class GameViewModel: ObservableObject {
      */
     
     // game state tracking for dealer and player
-    @Published private var dealer = Player(name: "Dealer", hand: [], score: 1000)
-    @Published private var mainPlayer = Player(name: "Player", hand: [], score: 10)
-    @Published private var pot: Int = 0
+    @Published var dealer = Player(name: "Dealer", hand: [], score: 1000)
+    @Published var mainPlayer = Player(name: "Player", hand: [], score: 10)
+    @Published var pot: Int = 0
     
     private var deck: [Card] = []
 
@@ -40,25 +40,42 @@ class GameViewModel: ObservableObject {
         print("Welcome to Blackjack!")
         // Creating Deck and shuffling
         createDeck()
-        print(deck[0])
         
-        // deal 1 to dealer
+        // Checking shuffled cards
+        print(deck[2])
+        
+        // deal 1 to dealer - pass the dealer in
+        dealCard(player: &dealer)
         
         // deal 1 to player
+        dealCard(player: &mainPlayer)
         
         // deal 2 to dealer
+        dealCard(player: &dealer)
         
         // deal 2 to player
+        dealCard(player: &mainPlayer)
+        
+        // Checking Hands
+        print(mainPlayer.hand[0])
+        print(mainPlayer.hand[1])
+        print(dealer.hand[0])
+        print(dealer.hand[1])
         
         // --- while loop, condition on hand score + player action
+        while (handScore(player: mainPlayer) < 21) {
+            // ask player
+            dealCard(player: &mainPlayer)
+            print(mainPlayer.hand)
+            // receive response
+            
+            // validate winner
+            
+            //
+            break
+        }
         
-        // ask player
-        
-        // receive response
-        
-        // validate winner
-        
-        //
+    
     }
     
     func createDeck() {
@@ -74,11 +91,72 @@ class GameViewModel: ObservableObject {
         self.deck.shuffle()
     }
     
-    func dealCard() -> Card {
-        return self.deck.removeFirst()
+    // Dealing Card from Deck to a specific player
+        // inout to modify parameter
+    func dealCard(player: inout Player) {
+        player.hand.append(deck.removeFirst())
     }
     
-    func compare() -> {
+    
+    // Calculating hand score
+    func handScore(player: Player) -> Int {
+        var score: Int = 0
         
+        // make an array of values from the player hand
+        var copy: [String] = []
+        
+        // adding the values to the copy
+        for card in player.hand {
+            copy.append(card.value)
+        }
+        
+        // sorting in reverse - makes 1 at the end so can deal with ace case
+        copy.sort()
+        copy.reverse()
+        
+        // create a copy to make sure 'A' is the first
+        // sort the copy with sort()
+        // use a reversed for loop to calcute to have A or 1 at the end to check for
+        //      space of 11 or 1
+        
+        // loop cards in hand
+        for value in copy {
+            if value == "J" || value == "Q" || value == "K" {
+                score += 10
+            } else if value == "1" {
+                // A can be either 11 or 1
+                if score + 11 > 21 {
+                    score += 1
+                } else {
+                    score += 11
+                }
+            } else {
+                score += Int(value)!
+            }
+        }
+        
+        return score
+    }
+    
+    func compare() -> Player {
+        // need to convert rank to int value
+    
+        let playerHand: Int = handScore(player: self.dealer)
+        let dealerHand: Int = handScore(player: self.mainPlayer)
+        
+        if playerHand == 21 || dealerHand > 21 {
+            return self.mainPlayer
+        } else if dealerHand == 21 || playerHand > 21 {
+            return self.dealer
+        } else if playerHand > dealerHand {
+            return self.mainPlayer
+        } else if playerHand < dealerHand {
+            return self.dealer
+        } else {
+            print("Error")
+        }
+        
+        
+        return self.mainPlayer
     }
 }

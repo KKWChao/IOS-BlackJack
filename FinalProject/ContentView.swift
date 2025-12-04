@@ -54,7 +54,8 @@ struct ContentView: View {
                     Spacer()
                     HStack() {
                         RoundedRectangle(cornerRadius: 10).fill(Color.gray).frame(width: 80, height: 120).padding()
-                        CardView(card: Card(value: "7", suit: "♣️"))
+                        CardView(card: Card(value: game.dealer.hand[1].value, suit: game.dealer.hand[1].suit))
+                        
                     }
                     Spacer()
                     
@@ -65,8 +66,9 @@ struct ContentView: View {
                     }
                     Spacer()
                     HStack {
-                        CardView(card: Card(value: "K", suit: "❤️"))
-                        CardView(card: Card(value: "A", suit: "♠️"))
+                        CardView(card: Card(value: game.mainPlayer.hand[0].value, suit: game.mainPlayer.hand[0].suit))
+                        CardView(card: Card(value: game.mainPlayer.hand[1].value, suit: game.mainPlayer.hand[1].suit))
+                        
                     }
                     Spacer()
                 }
@@ -121,7 +123,7 @@ struct ContentView: View {
                 }
             }
             HStack {
-                Text("100 Coins")
+                Text("\(game.pot)")
             }
 
 
