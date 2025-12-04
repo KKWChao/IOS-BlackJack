@@ -14,7 +14,7 @@ struct CardView: View {
     
     var body: some View {
         ZStack{
-            RoundedRectangle(cornerRadius: 10).fill(Color.white).frame(width: 80, height: 120).padding().shadow(radius: 5)
+            RoundedRectangle(cornerRadius: 10).fill(Color.white).frame(width: 80, height: 120).shadow(radius: 5)
             VStack{
                 Text(card.suit)
                 Text(card.value).fontWeight(.bold)
@@ -23,4 +23,8 @@ struct CardView: View {
         }
         
     }
+}
+
+#Preview {
+    CardView(card: Card( value: "10", suit: "Spades"))
 }

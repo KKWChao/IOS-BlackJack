@@ -8,6 +8,11 @@
 import Foundation
 
 class GameViewModel: ObservableObject {
+    // TODO: Need to figure out how to pass the name to the game state
+    // @Published var playerName: String = ""
+    
+    // TODO: Add state for quit, WIN OR LOSE? states or 0, 1, 2?
+    
     /*
      Loop for game
      
@@ -27,17 +32,20 @@ class GameViewModel: ObservableObject {
     
     // game state tracking for dealer and player
     @Published var dealer = Player(name: "Dealer", hand: [], score: 1000)
-    @Published var mainPlayer = Player(name: "Player", hand: [], score: 10)
+    @Published var mainPlayer = Player(name: "", hand: [], score: 10)
     @Published var pot: Int = 0
     
     private var deck: [Card] = []
 
-    init() {
+    init(playerName: String) {
+        self.mainPlayer.name = playerName
         startGame()
     }
     
+    // TODO: Finish Game Loop
     func startGame() {
         print("Welcome to Blackjack!")
+        
         // Creating Deck and shuffling
         createDeck()
         
@@ -94,7 +102,11 @@ class GameViewModel: ObservableObject {
     // Dealing Card from Deck to a specific player
         // inout to modify parameter
     func dealCard(player: inout Player) {
+        print("Dealing card to \(player.name)")
+        print("Deck count: \(deck.count)")
+        
         player.hand.append(deck.removeFirst())
+        print(player.hand)
     }
     
     
@@ -158,5 +170,18 @@ class GameViewModel: ObservableObject {
         
         
         return self.mainPlayer
+    }
+    
+    // Pot Functions
+    func addToPot(_ amount: Int) {
+        self.pot += 5
+    }
+    
+    func removeFromPot(_ amount: Int) {
+        self.pot -= 5
+    }
+    
+    func resetPot() {
+        self.pot = 0
     }
 }
