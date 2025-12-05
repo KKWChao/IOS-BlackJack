@@ -10,14 +10,13 @@ import SwiftUI
 struct GameView: View {
     var playerName: String = ""
     
-    @StateObject private var game = GameViewModel(playerName: "Test")
+    @StateObject private var game = GameViewModel(playerName: "KC")
     
     @State private var potScale = 1.0
     @State private var bg = Color.green;
 
     
     var body: some View {
-        
         VStack {
             HStack {
                 Text("Welcome!\nPlayer: \(playerName)").foregroundStyle(bg).font(.title2)
@@ -100,7 +99,8 @@ struct GameView: View {
                         RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(bg).shadow(radius: 10)
                         
                         Button(action: {
-                            game.dealCard(player: &self.game.mainPlayer)
+                            game.dealToPlayer()
+                            
                         }) {
                             Text("Hit")
                                 .frame(width: 150, height: 30)

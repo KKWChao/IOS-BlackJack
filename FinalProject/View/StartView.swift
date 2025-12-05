@@ -17,9 +17,9 @@ struct StartView: View {
 
             VStack {
                 HStack {
-                    Text("♠️").font(.system(size: 80)).padding()
+                    Text("♠️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: -30))
                     Spacer()
-                    Text("❤️").font(.system(size: 80)).padding()
+                    Text("❤️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 30))
                 }.padding()
                 Spacer()
                 Text("Black Jack")
@@ -37,9 +37,9 @@ struct StartView: View {
                 }.disabled(textInput.isEmpty)
                 Spacer()
                 HStack {
-                    Text("♦️").font(.system(size: 80)).padding()
+                    Text("♦️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 210))
                     Spacer()
-                    Text("♣️").font(.system(size: 80)).padding()
+                    Text("♣️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 150))
                 }.padding()
             }
         }.navigationTitle("")
