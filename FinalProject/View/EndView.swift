@@ -8,8 +8,17 @@
 import SwiftUI
 
 struct EndView: View {
+    var playerName: String = "Player"
+    
     var body: some View {
-        Text("Game Over").font(.largeTitle)
+        ZStack {
+            Color.green.edgesIgnoringSafeArea(.all)
+            VStack {
+                Text("Game Over").foregroundColor(Color.white).font(.largeTitle).padding()
+                Text("Thanks for playing \(playerName)!").foregroundColor(Color.white).font(.title)
+            }
+        }
+
     }
 }
 

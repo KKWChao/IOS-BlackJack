@@ -12,7 +12,9 @@ class GameViewModel: ObservableObject {
     // @Published var playerName: String = ""
     
     // TODO: Add state for quit, WIN OR LOSE? states or 0, 1, 2?
+    // Separate view model? one for game and one for game state?
     
+    // TODO: need to allow for player to view dealer last card on stay()
     /*
      Loop for game
      
@@ -44,13 +46,12 @@ class GameViewModel: ObservableObject {
     
     // TODO: Finish Game Loop
     func startGame() {
-        print("Welcome to Blackjack!")
         
         // Creating Deck and shuffling
         createDeck()
         
         // Checking shuffled cards
-        print(deck[2])
+//        print(deck[2])
         
         // deal 1 to dealer - pass the dealer in
         dealCard(player: &dealer)
@@ -65,25 +66,11 @@ class GameViewModel: ObservableObject {
         dealCard(player: &mainPlayer)
         
         // Checking Hands
-        print(mainPlayer.hand[0])
-        print(mainPlayer.hand[1])
-        print(dealer.hand[0])
-        print(dealer.hand[1])
+//        print(mainPlayer.hand[0])
+//        print(mainPlayer.hand[1])
+//        print(dealer.hand[0])
+//        print(dealer.hand[1])
         
-        // --- while loop, condition on hand score + player action
-        while (handScore(player: mainPlayer) < 21) {
-            // ask player
-            dealCard(player: &mainPlayer)
-            print(mainPlayer.hand)
-            // receive response
-            
-            // validate winner
-            
-            //
-            break
-        }
-        
-    
     }
     
     func createDeck() {
@@ -102,16 +89,41 @@ class GameViewModel: ObservableObject {
     // Dealing Card from Deck to a specific player
         // inout to modify parameter
     func dealCard(player: inout Player) {
+        
+        
         print("Dealing card to \(player.name)")
         print("Deck count: \(deck.count)")
         
         player.hand.append(deck.removeFirst())
-        print(player.hand)
+        
+        // TODO: Finish this logic
+        if checkBust(player: player) {
+            print("BUST!")
+            
+        }
     }
     
+    // function to pass over to dealer and dealer hits until 17 is reached
+    func stay() {
+        // get value of dealer hand
+        var dealerValue: Int = handValue(player: dealer)
+        
+        // if value < 17, hit dealer
+        while dealerValue < 17 {
+            dealCard(player: &dealer)
+            dealerValue = handValue(player: dealer)
+        }
+        
+        if dealerValue > 21 {
+            print("Dealer busts!")
+        }
+        
+        // compare value between player and dealer
+        print(compare())
+    }
     
     // Calculating hand score
-    func handScore(player: Player) -> Int {
+    func handValue(player: Player) -> Int {
         var score: Int = 0
         
         // make an array of values from the player hand
@@ -150,26 +162,31 @@ class GameViewModel: ObservableObject {
         return score
     }
     
-    func compare() -> Player {
+    // function to check if bust
+    func checkBust(player: Player) -> Bool {
+        return handValue(player: player) > 21 ? true : false
+    }
+    
+    // function for ending the game
+    func compare() -> String {
         // need to convert rank to int value
     
-        let playerHand: Int = handScore(player: self.dealer)
-        let dealerHand: Int = handScore(player: self.mainPlayer)
+        let playerHand: Int = handValue(player: self.dealer)
+        let dealerHand: Int = handValue(player: self.mainPlayer)
         
         if playerHand == 21 || dealerHand > 21 {
-            return self.mainPlayer
+            return self.mainPlayer.name
         } else if dealerHand == 21 || playerHand > 21 {
-            return self.dealer
-        } else if playerHand > dealerHand {
-            return self.mainPlayer
+            return self.dealer.name
+        } else if playerHand > dealerHand  {
+            return self.mainPlayer.name
         } else if playerHand < dealerHand {
-            return self.dealer
+            return self.dealer.name
         } else {
             print("Error")
+            return mainPlayer.name
         }
-        
-        
-        return self.mainPlayer
+    
     }
     
     // Pot Functions

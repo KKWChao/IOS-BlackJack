@@ -33,8 +33,10 @@ struct GameView: View {
                 VStack {
                     Spacer()
                     HStack() {
-                        RoundedRectangle(cornerRadius: 10).fill(Color.gray).frame(width: 80, height: 120)
-                        CardView(card: Card(value: game.dealer.hand[1].value, suit: game.dealer.hand[1].suit))
+//                        RoundedRectangle(cornerRadius: 10).fill(Color.gray).frame(width: 80, height: 120)
+                        ForEach(game.dealer.hand) { card in
+                            CardView(card: card)
+                        }
                         
                     }
                     Spacer()
@@ -54,16 +56,17 @@ struct GameView: View {
                 }
             
             }
+            
             HStack {
                 if(game.pot >= 15) {
                     Image(systemName: "exclamationmark.triangle").resizable().frame(width: 50, height: 50).foregroundColor(.red)
                 }
 
                 ZStack {
-                    RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(.gray).padding().shadow(radius: 10)
-                    
+
+                    Circle().fill(Color.yellow).frame(width: 100, height: 100).padding()
                     Text("Bet?")
-                        .frame(width: 150, height: 30)
+                        .frame(width: 100, height: 100)
                         .font(.title)
                         .foregroundColor(.white).contextMenu {
                             Button(action: {
@@ -90,21 +93,39 @@ struct GameView: View {
                         }
                     
                 }
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(.gray).padding().shadow(radius: 10)
-                    
+                Spacer()
+                VStack {
                     // dealing the card
-                    Button(action: {
-                        game.dealCard(player: &self.game.mainPlayer)
-                    }) {
-                        Text("Hit")
-                            .frame(width: 150, height: 30)
-                            .font(.title)
-                            .foregroundColor(.white)
-                    }
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(bg).shadow(radius: 10)
+                        
+                        Button(action: {
+                            game.dealCard(player: &self.game.mainPlayer)
+                        }) {
+                            Text("Hit")
+                                .frame(width: 150, height: 30)
+                                .font(.title)
+                                .foregroundColor(.white)
+                        }
 
-                }
+                    }
+                    // Stay
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(.gray).shadow(radius: 10)
+                        
+                        Button(action: {
+                            game.stay()
+                        }) {
+                            Text("Stay")
+                                .frame(width: 150, height: 30)
+                                .font(.title)
+                                .foregroundColor(.white)
+                        }
+
+                    }
+                }.padding()
+
+                
                 if(game.pot < 0) {
                     Image(systemName: "questionmark.diamond").resizable().frame(width: 50, height: 50).foregroundColor(.blue)
                 }
