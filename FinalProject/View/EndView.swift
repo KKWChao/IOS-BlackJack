@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct EndView: View {
-    var playerName: String = "Player"
+    var playerName: String
+    var score: Int = 0
     
     var body: some View {
         ZStack {
@@ -22,6 +23,7 @@ struct EndView: View {
                 Spacer()
                 Text("Game Over").foregroundColor(Color.white).font(.system(size: 64)).fontDesign(.serif).padding()
                 Text("Thanks for playing \(playerName)!").foregroundColor(Color.white).font(.title)
+                Text("Final Score: \(score)").foregroundStyle(.white).fontWeight(.bold)
                 Spacer()
                 HStack {
                     Text("♦️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 210))
@@ -35,5 +37,5 @@ struct EndView: View {
 }
 
 #Preview {
-    EndView()
+    EndView(playerName: "KC")
 }

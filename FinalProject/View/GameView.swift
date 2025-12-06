@@ -9,41 +9,62 @@ import SwiftUI
 
 struct GameView: View {
     var playerName: String = ""
+
+    @StateObject private var game: GameViewModel
     
-    @StateObject private var game = GameViewModel(playerName: "KC")
+    init(playerName: String) {
+        _game = StateObject(wrappedValue: GameViewModel(playerName: playerName))
+    }
     
-    @State private var potScale = 1.0
     @State private var bg = Color.green;
 
     
     var body: some View {
         VStack {
+            // HEADER AREA
             HStack {
-                Text("Welcome!\nPlayer: \(playerName)").foregroundStyle(bg).font(.title2)
+                Text("Welcome!\nPlayer: \(game.mainPlayer.name)").foregroundStyle(bg).font(.title2)
                 Spacer()
-                NavigationLink(destination: EndView()) {
+                NavigationLink(destination: EndView(playerName: game.mainPlayer.name, score: game.mainPlayer.score)) {
                     Text("End Game?")
                 }
             }
             
-
+            // MAIN GAME AREA
             ZStack {
                 RoundedRectangle(cornerRadius: 10).fill(bg).shadow(radius: 5)
                 VStack {
                     Spacer()
                     HStack() {
+                        // TODO: Need to figure out how to hide first card
 //                        RoundedRectangle(cornerRadius: 10).fill(Color.gray).frame(width: 80, height: 120)
                         ForEach(game.dealer.hand) { card in
                             CardView(card: card)
                         }
-                        
                     }
                     Spacer()
                     
                     ZStack {
-                        Circle().fill(Color.white).frame(width: 80)
-                        Text("\(game.pot)").fontWeight(.bold).foregroundColor(.blue).font(.title).scaleEffect(potScale)
+                        Circle().fill(Color.yellow).frame(width: 100)
+                        
+                        if (game.gameState != .checking) {
+                            Text("\(game.pot)").fontWeight(.bold).foregroundColor(.blue).font(.title)
+                        } else {
+                            ZStack {
+                                bg.opacity(0.85)
+                                
+                                VStack {
+                                    Text("\(game.winner) Wins!").font(.title).foregroundStyle(.white)
+                                    Button(action: {game.startGame()}) {
+                                        Text("Next Game?")
+                                    }.buttonStyle(.borderedProminent)
+                                }
+                            }.frame(width: 300, height: 100)
+
+
+                        }
                     }
+
                     Spacer()
                     
                     HStack {
@@ -56,35 +77,27 @@ struct GameView: View {
             
             }
             
+            // PLAYER ACTION AREA
             HStack {
-                if(game.pot >= 15) {
-                    Image(systemName: "exclamationmark.triangle").resizable().frame(width: 50, height: 50).foregroundColor(.red)
-                }
-
                 ZStack {
-
-                    Circle().fill(Color.yellow).frame(width: 100, height: 100).padding()
+                    // color ternary based on state
+                    Circle().fill(game.gameState == .betting ? Color.blue : Color.gray).frame(width: 100, height: 100).padding()
                     Text("Bet?")
                         .frame(width: 100, height: 100)
                         .font(.title)
-                        .foregroundColor(.white).contextMenu {
+                        .foregroundColor(.white)
+                        .onTapGesture(perform: {
+                            game.addToPot()
+                        })
+                        .contextMenu {
                             Button(action: {
-                                game.addToPot(5)
-                                self.potScale += 0.2
-                            }) {
-                                Text("Add")
-                                Image(systemName: "plus")
-                            }
-                            Button(action: {
-                                game.removeFromPot(5)
-                                self.potScale -= 0.2
+                                game.removeFromPot()
                             }) {
                                 Text("Subtract")
                                 Image(systemName: "minus")
                             }
                             Button(action: {
-                                game.pot = 0
-                                self.potScale = 1
+                                game.resetPot()
                             }) {
                                 Text("Reset")
                                 Image(systemName: "eraser")
@@ -93,6 +106,7 @@ struct GameView: View {
                     
                 }
                 Spacer()
+                
                 VStack {
                     // dealing the card
                     ZStack {
@@ -124,12 +138,9 @@ struct GameView: View {
 
                     }
                 }.padding()
-
-                
-                if(game.pot < 0) {
-                    Image(systemName: "questionmark.diamond").resizable().frame(width: 50, height: 50).foregroundColor(.blue)
-                }
             }
+            
+            // THEME CHOICE AND PLAYER SCORE
             HStack {
                 Button(action: {}) {
                     Text("Theme")
@@ -146,7 +157,7 @@ struct GameView: View {
                 }
 
                 Spacer()
-                Text("\(game.pot)").font(.title).padding()
+                Text("My Coins: \(game.mainPlayer.score)").font(.title).foregroundColor(Color.primary).padding()
             }
 
         }
@@ -155,5 +166,5 @@ struct GameView: View {
 }
 
 #Preview {
-    GameView()
+    GameView(playerName: "KC")
 }

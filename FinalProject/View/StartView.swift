@@ -31,9 +31,12 @@ struct StartView: View {
                 
                 TextField("Enter player name", text: $textInput).padding(10).background(Color.white).cornerRadius(10).padding(.horizontal, 100)
                 
-                
                 NavigationLink(destination: GameView(playerName: textInput)) {
-                    Text("Start Game")
+                    ZStack {
+                        RoundedRectangle (cornerRadius: 10).fill(Color.gray).frame(width: 200, height: 40)
+                        Text("Start Game").font(.system(size: 24, weight: .bold))
+                    }
+                    
                 }.disabled(textInput.isEmpty)
                 Spacer()
                 HStack {
