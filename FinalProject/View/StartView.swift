@@ -5,6 +5,14 @@
 //  Created by Kelvin Chao on 12/3/25.
 //
 
+/*
+ * Kelvin Chao
+ * CIS 137
+ * Pacheco
+ * Final Project
+ * 11/24/25
+ */
+
 import SwiftUI
 
 struct StartView: View {

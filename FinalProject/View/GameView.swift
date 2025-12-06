@@ -5,6 +5,14 @@
 //  Created by Kelvin Chao on 12/3/25.
 //
 
+/*
+ * Kelvin Chao
+ * CIS 137
+ * Pacheco
+ * Final Project
+ * 11/24/25
+ */
+
 import SwiftUI
 
 struct GameView: View {
@@ -27,7 +35,7 @@ struct GameView: View {
                 Spacer()
                 NavigationLink(destination: EndView(playerName: game.mainPlayer.name, score: game.mainPlayer.score)) {
                     Text("End Game?")
-                }
+                }.buttonStyle(.bordered).foregroundColor(.blue).padding(.horizontal)
             }
             
             // MAIN GAME AREA
@@ -47,7 +55,7 @@ struct GameView: View {
                     ZStack {
                         Circle().fill(Color.yellow).frame(width: 100)
                         
-                        if (game.gameState != .checking) {
+                        if (game.gameState != .gameOver) {
                             Text("\(game.pot)").fontWeight(.bold).foregroundColor(.blue).font(.title)
                         } else {
                             ZStack {
@@ -55,9 +63,7 @@ struct GameView: View {
                                 
                                 VStack {
                                     Text("\(game.winner) Wins!").font(.title).foregroundStyle(.white)
-                                    Button(action: {game.startGame()}) {
-                                        Text("Next Game?")
-                                    }.buttonStyle(.borderedProminent)
+                                    Text("\(game.winner == "Dealer" ? "-" : "+") \(game.pot)").foregroundStyle(Color.yellow).font(.title).fontWeight(.bold)
                                 }
                             }.frame(width: 300, height: 100)
 
@@ -112,11 +118,27 @@ struct GameView: View {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10).frame(width: 150, height: 50).foregroundColor(bg).shadow(radius: 10)
                         
-                        Button(action: {
-                            game.dealToPlayer()
-                            
-                        }) {
-                            Text("Hit")
+                        if (game.gameState == .betting || game.gameState == .playerTurn) {
+                            Button(action: {
+                                game.dealToPlayer()
+                                
+                            }) {
+                                Text("Hit")
+                                    .frame(width: 150, height: 30)
+                                    .font(.title)
+                                    .foregroundColor(.white)
+                            }
+                        } else if (game.mainPlayer.score > 0) {
+                            Button(action: {
+                                game.startGame()
+                            }) {
+                                Text("Next Round")
+                                    .frame(width: 150, height: 30)
+                                    .font(.title)
+                                    .foregroundColor(.white)
+                            }
+                        } else {
+                            Text("Game Over")
                                 .frame(width: 150, height: 30)
                                 .font(.title)
                                 .foregroundColor(.white)

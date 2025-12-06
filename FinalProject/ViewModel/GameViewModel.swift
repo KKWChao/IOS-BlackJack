@@ -5,6 +5,14 @@
 //  Created by Kelvin Chao on 11/24/25.
 //
 
+/*
+ * Kelvin Chao
+ * CIS 137
+ * Pacheco
+ * Final Project
+ * 11/24/25
+ */
+
 import Foundation
 
 class GameViewModel: ObservableObject {
@@ -19,14 +27,14 @@ class GameViewModel: ObservableObject {
         a. Create deck of 52 Cards [x]
      2. Dealer gets 2 cards, user gets 2 [x]
         a. dealer onlys shows 1 to user []
-     3. user choose to add to bet or no change []
+     3. user choose to add to bet or no change [x]
      4. user chooses to hit or stay [x]
      5. If hit then add card to user hand [x]
      6. Else game calc to see who has a better hand [x]
-     7. If User wins, user gets pot []
-     8. Else If User loses, user loses pot []
-     9. Else User gets bet back []
-     10. Call start game again
+     7. If User wins, user gets pot [x]
+     8. Else If User loses, user loses pot [x]
+     9. Else User gets bet back [x]
+     10. Call start game again from user [x]
      */
     
     // game state tracking for dealer and player
@@ -35,7 +43,6 @@ class GameViewModel: ObservableObject {
     @Published var pot: Int = 1
     @Published var winner: String = ""
     
-    
     private var deck: [Card] = []
 
     init(playerName: String) {
@@ -43,7 +50,6 @@ class GameViewModel: ObservableObject {
         startGame()
     }
     
-    // TODO: Finish Game Loop
     func startGame() {
         
         // Clearing out for game loop
@@ -53,7 +59,7 @@ class GameViewModel: ObservableObject {
         // Checking shuffled cards
 //        print(deck[2])
         print("New Round")
-        
+    
         dealCard(to: &dealer)
         
         dealCard(to: &mainPlayer)
@@ -91,16 +97,21 @@ class GameViewModel: ObservableObject {
         dealCard(to: &mainPlayer)
         gameState = .playerTurn
         
+        // Check if player bust
         if (handValue(player: mainPlayer) > 21) {
-            gameState = .checking
+            gameState = .gameOver
             winner = dealer.name
-        } 
+        } else if (handValue(player: mainPlayer) == 21) {
+            gameState = .gameOver
+            pot *= 2
+            mainPlayer.score += pot
+            winner = mainPlayer.name
+        }
     }
     
     
     // DEALING CARD TO PLAYER
     func dealCard(to player: inout Player) {
-//        print("Dealing card to \(player.name)")
         let card: Card = deck.removeFirst()
         
         // had to add this to make sure hands update on view side, Player is a struct which doesn't keep track of mutations
@@ -122,16 +133,20 @@ class GameViewModel: ObservableObject {
         }
         
         // Dealer will stay at hand value > 17
-        if (dealerValue > 17 && dealerValue < 22) {
+        if (dealerValue >= 17 && dealerValue < 22) {
             gameState = .checking
         }
         
+        // Check if dealer busts
         if dealerValue > 21 {
-            gameState = .checking
+            gameState = .gameOver
+            
+            mainPlayer.score += pot
+            
             winner = mainPlayer.name
+            
         }
         
-        // TODO: add a pause so player can see dealt card
         dealer = dealer // force reload
         
         // compare value between player and dealer
@@ -140,9 +155,20 @@ class GameViewModel: ObservableObject {
     
     // GAME RESET
     func reset() {
+        // break if no more coins
+        if (mainPlayer.score < 1) {
+            gameState = .gameOver
+            return
+        }
+        
         mainPlayer.hand.removeAll()
         dealer.hand.removeAll()
         createDeck()
+        
+        resetPot()
+        
+        // initial forced bet
+        mainPlayer.score -= 1
         winner = ""
         gameState = .betting
     }
@@ -194,33 +220,21 @@ class GameViewModel: ObservableObject {
         
         let playerHand: Int = handValue(player: self.mainPlayer)
         let dealerHand: Int = handValue(player: self.dealer)
-        
-        // maybe move this to hit()
-        if playerHand > 21 || dealerHand == 21 && playerHand != 21 {
-            resetPot()
-            winner = dealer.name
-        }
-        // move this to stay()
-        if dealerHand > 21 || playerHand == 21 {
-            mainPlayer.score += pot * 2
-            resetPot()
-            winner = mainPlayer.name
-        }
-        // FIX THIS double checking
-        // Need this to check end game and check value when dealer stays ie value > 17
+
         if (gameState == .checking && playerHand < 22 && dealerHand < 22) {
             
             print("Checking")
             
             if playerHand > dealerHand {
-                mainPlayer.score += pot * 2
-                resetPot()
+                mainPlayer.score += pot
                 winner = mainPlayer.name
-            }
-            if playerHand < dealerHand {
-                resetPot()
+            } else if playerHand < dealerHand {
                 winner = dealer.name
+            } else {
+                winner = ""
             }
+            
+            gameState = .gameOver
         }
     }
 
@@ -232,7 +246,8 @@ class GameViewModel: ObservableObject {
         
         // removing form player score
         if (mainPlayer.score == 0) {return}
-        pot += 1
+        pot += 2
+        print(pot)
         mainPlayer.score -= 1
     }
     
@@ -241,26 +256,29 @@ class GameViewModel: ObservableObject {
         if (gameState != .betting) {return}
         
         // make sure player cant go into neg
-        if (pot == 1) { return }
+        if (pot <= 2 ) { return }
         pot -= 1
     }
     
     func resetPot() {
         // no betting if player has hit
-        if (gameState != .betting) {return}
-        
-        if (pot != 1) {
-            mainPlayer.score += pot - 1
+        if (gameState == .betting) {
+            if (pot != 1) {
+                mainPlayer.score += pot - 1
+                pot = 1
+            }
+        } else {
             pot = 1
         }
     }
+    
 }
 
 // for game state progression
 enum GameState {
     case betting
-    case dealing
     case playerTurn
     case dealerTurn
     case checking
+    case gameOver
 }

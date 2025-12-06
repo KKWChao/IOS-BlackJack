@@ -5,6 +5,14 @@
 //  Created by Kelvin Chao on 12/3/25.
 //
 
+/*
+ * Kelvin Chao
+ * CIS 137
+ * Pacheco
+ * Final Project
+ * 11/24/25
+ */
+
 import SwiftUI
 
 struct EndView: View {
@@ -21,7 +29,7 @@ struct EndView: View {
                     Text("❤️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 30))
                 }.padding()
                 Spacer()
-                Text("Game Over").foregroundColor(Color.white).font(.system(size: 64)).fontDesign(.serif).padding()
+                Text("Game Over").foregroundColor(Color.white).font(.system(size: 64)).padding()
                 Text("Thanks for playing \(playerName)!").foregroundColor(Color.white).font(.title)
                 Text("Final Score: \(score)").foregroundStyle(.white).fontWeight(.bold)
                 Spacer()
@@ -31,7 +39,7 @@ struct EndView: View {
                     Text("♣️").font(.system(size: 80)).padding().rotationEffect(Angle(degrees: 150))
                 }.padding()
             }
-        }
+        }.fontDesign(.serif)
 
     }
 }
